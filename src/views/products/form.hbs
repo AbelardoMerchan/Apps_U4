@@ -1,0 +1,31 @@
+<h3 class="mb-3">{{#if isCreate}}Nuevo producto{{else}}Editar producto{{/if}}</h3>
+
+{{#if errors}}
+  <div class="alert alert-danger">
+    <ul class="mb-0">
+      {{#each errors}}<li>{{this.msg}}</li>{{/each}}
+    </ul>
+  </div>
+{{/if}}
+
+<form method="post" enctype="multipart/form-data" action="{{#if isCreate}}/products{{else}}/products/{{product._id}}?_method=PUT{{/if}}">
+  <div class="mb-3">
+    <label class="form-label">Nombre</label>
+    <input name="nombre" class="form-control" value="{{#if isCreate}}{{data.nombre}}{{else}}{{product.nombre}}{{/if}}" required>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Precio</label>
+    <input name="precio" type="number" step="0.01" class="form-control" value="{{#if isCreate}}{{data.precio}}{{else}}{{product.precio}}{{/if}}" required>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Descripción</label>
+    <textarea name="descripcion" class="form-control" rows="3" required>{{#if isCreate}}{{data.descripcion}}{{else}}{{product.descripcion}}{{/if}}</textarea>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Imagen (jpg/png/webp)</label>
+    <input type="file" name="imagen" class="form-control">
+    {{#if product.imagen}}<img src="{{product.imagen}}" class="img-fluid mt-2" style="max-height:120px">{{/if}}
+  </div>
+  <button class="btn btn-primary">Guardar</button>
+  <a class="btn btn-secondary" href="/products">Volver</a>
+</form>

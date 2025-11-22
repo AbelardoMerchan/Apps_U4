@@ -1,0 +1,9 @@
+<h2>Ingresar</h2>
+{{#if error}}<div class="alert">{{error}}</div>{{/if}}
+<form method="post" action="/auth/login">
+  <label>Usuario</label>
+  <input name="username" required/>
+  <label>Contraseña</label>
+  <input type="password" name="password" required/>
+  <button>Entrar</button>
+</form>

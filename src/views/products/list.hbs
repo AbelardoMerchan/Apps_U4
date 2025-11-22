@@ -1,0 +1,9 @@
+<h2>Productos</h2>
+<a href="/products/new">Nuevo</a>
+<ul>
+  {{#each items}}
+    <li>{{this.name}} — ${{this.price}}</li>
+  {{else}}
+    <li>Sin productos</li>
+  {{/each}}
+</ul>
