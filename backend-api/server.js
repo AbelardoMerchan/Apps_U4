@@ -1,75 +1,57 @@
 // server.js - Backend API U3 en CommonJS
 const express = require("express");
 const cors = require("cors");
+const fs      = require("fs");
+const path    = require("path");
 
-const app  = express();
+const app = express();
 const port = process.env.PORT || 4000; // usamos puerto 4000
+const dataDir        = path.join(__dirname, "data");
+const categoriesFile = path.join(dataDir, "categories.json");
+const productsFile   = path.join(dataDir, "products.json");
+
+// funciones para cargar y guardar
+function loadJson(filePath, defaultValue) {
+  try {
+    if (!fs.existsSync(filePath)) {
+      return defaultValue;
+    }
+    const content = fs.readFileSync(filePath, "utf8");
+    return JSON.parse(content);
+  } catch (err) {
+    console.error("Error leyendo", filePath, err);
+    return defaultValue;
+  }
+}
+
+function saveJson(filePath, data) {
+  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+}
+
 
 app.use(cors());
 app.use(express.json());
 
-// ------- Datos en memoria -------
-let categories = [
-  { id: 1, name: "Electrónica" },
-  { id: 2, name: "Ropa" },
-  { id: 3, name: "Hogar" },
-];
 
-let products = [
-  {
-    id        : 1,
-    name      : "Smartphone X",
-    description: "Teléfono inteligente de 6.5 pulgadas",
-    price     : 350.0,
-    imageUrl  : "https://via.placeholder.com/300x200?text=Smartphone+X",
-    categoryId: 1,
-    stock     : 10,
-  },
-  {
-    id        : 2,
-    name      : "Audífonos Bluetooth",
-    description: "Audífonos inalámbricos con cancelación de ruido",
-    price     : 50.0,
-    imageUrl  : "https://via.placeholder.com/300x200?text=Audifonos",
-    categoryId: 1,
-    stock     : 25,
-  },
-  {
-    id        : 3,
-    name      : "Camiseta básica",
-    description: "Camiseta de algodón, unisex",
-    price     : 12.5,
-    imageUrl  : "https://via.placeholder.com/300x200?text=Camiseta",
-    categoryId: 2,
-    stock     : 50,
-  },
-  {
-    id        : 4,
-    name      : "Pantalón deportivo",
-    description: "Pantalón cómodo para hacer ejercicio",
-    price     : 25.0,
-    imageUrl  : "https://via.placeholder.com/300x200?text=Pantalon",
-    categoryId: 2,
-    stock     : 20,
-  },
-  {
-    id        : 5,
-    name      : "Lámpara de escritorio",
-    description: "Lámpara LED ajustable para escritorio",
-    price     : 18.0,
-    imageUrl  : "https://via.placeholder.com/300x200?text=Lampara",
-    categoryId: 3,
-    stock     : 15,
-  },
-];
+/// Cargar datos desde los archivos JSON (semilla)
+let categories = loadJson(categoriesFile, []);
+let products   = loadJson(productsFile, []);
 
-let nextProductId = products.length + 1;
+// Calcular siguiente ID disponible
+let nextProductId = products.reduce(
+  (max, p) => (p.id > max ? p.id : max),
+  0
+) + 1;
 
 // ---------- Validación ----------
 function validateProduct(body) {
   const errors = [];
 
-  if (!body.name || typeof body.name !== "string" || body.name.trim().length < 3) {
+  if (
+    !body.name ||
+    typeof body.name !== "string" ||
+    body.name.trim().length < 3
+  ) {
     errors.push("El nombre es obligatorio y debe tener al menos 3 caracteres.");
   }
 
@@ -103,12 +85,12 @@ function validateProduct(body) {
     isValid: errors.length === 0,
     errors,
     value: {
-      name       : body.name?.trim(),
+      name: body.name?.trim(),
       description: body.description?.trim() || "",
       price,
       stock,
       categoryId,
-      imageUrl   : body.imageUrl?.trim(),
+      imageUrl: body.imageUrl?.trim(),
     },
   };
 }
@@ -143,24 +125,8 @@ app.get("/api/products", (req, res) => {
   res.json(result);
 });
 
-app.get("/api/products/:id", (req, res) => {
-  const id = Number(req.params.id);
-  const product = products.find((p) => p.id === id);
-  if (!product) return res.status(404).json({ message: "Producto no encontrado" });
-  res.json(product);
-});
-
-app.post("/api/products", (req, res) => {
-  const { isValid, errors, value } = validateProduct(req.body);
-  if (!isValid) return res.status(400).json({ message: "Datos inválidos", errors });
-
-  const newProduct = { id: nextProductId++, ...value };
-  products.push(newProduct);
-  res.status(201).json(newProduct);
-});
-
 app.put("/api/products/:id", (req, res) => {
-  const id = Number(req.params.id);
+  const id    = Number(req.params.id);
   const index = products.findIndex((p) => p.id === id);
   if (index === -1) return res.status(404).json({ message: "Producto no encontrado" });
 
@@ -169,17 +135,68 @@ app.put("/api/products/:id", (req, res) => {
 
   const updated = { id, ...value };
   products[index] = updated;
+
+  // guardar cambios
+  saveJson(productsFile, products);
+
+  res.json(updated);
+});
+
+
+app.post("/api/products", (req, res) => {
+  const { isValid, errors, value } = validateProduct(req.body);
+  if (!isValid) return res.status(400).json({ message: "Datos inválidos", errors });
+
+  const newProduct = { id: nextProductId++, ...value };
+  products.push(newProduct);
+
+  // guardar cambios
+  saveJson(productsFile, products);
+
+  res.status(201).json(newProduct);
+});
+
+
+app.put("/api/products/:id", (req, res) => {
+  const id = Number(req.params.id);
+  const index = products.findIndex((p) => p.id === id);
+  if (index === -1)
+    return res.status(404).json({ message: "Producto no encontrado" });
+
+  const { isValid, errors, value } = validateProduct(req.body);
+  if (!isValid)
+    return res.status(400).json({ message: "Datos inválidos", errors });
+
+  const updated = { id, ...value };
+  products[index] = updated;
   res.json(updated);
 });
 
 app.delete("/api/products/:id", (req, res) => {
-  const id = Number(req.params.id);
+  const id    = Number(req.params.id);
   const index = products.findIndex((p) => p.id === id);
   if (index === -1) return res.status(404).json({ message: "Producto no encontrado" });
 
   const deleted = products.splice(index, 1)[0];
+
+  // guardar cambios
+  saveJson(productsFile, products);
+
   res.json({ message: "Producto eliminado", product: deleted });
 });
+
+
+// --- 404 genérico para cualquier otra ruta ---
+app.use((req, res, next) => {
+  res.status(404).json({ message: "Recurso no encontrado" });
+});
+
+// --- Manejo de errores 500 (error interno) ---
+app.use((err, req, res, next) => {
+  console.error("Error no controlado:", err);
+  res.status(500).json({ message: "Error interno del servidor" });
+});
+
 
 // ---------- Arranque ----------
 app.listen(port, () => {

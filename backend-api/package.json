@@ -4,7 +4,8 @@
   "description": "Backend API U3 - MercApp",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "seed": "node seed.js"
   },
   "keywords": [],
   "author": "",
