@@ -1,0 +1,19 @@
+/* src/assets/main.css */
+:root {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+  background-color: #f4f4f4;
+}
+
+a {
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}

@@ -1,0 +1,17 @@
+{
+  "name": "backend-api-u3",
+  "version": "1.0.0",
+  "description": "Backend API U3 - MercApp",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.0"
+  }
+}
+
