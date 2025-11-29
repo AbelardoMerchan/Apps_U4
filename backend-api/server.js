@@ -1,16 +1,23 @@
-// server.js - Backend API U3 en CommonJS
+require("dotenv").config(); // <- carga variables de entorno
+
 const express = require("express");
 const cors = require("cors");
-const fs      = require("fs");
-const path    = require("path");
+const fs = require("fs");
+const path = require("path");
+const mongoose = require("mongoose"); // <- conexión a MongoDB Atlas
 
 const app = express();
-const port = process.env.PORT || 4000; // usamos puerto 4000
-const dataDir        = path.join(__dirname, "data");
-const categoriesFile = path.join(dataDir, "categories.json");
-const productsFile   = path.join(dataDir, "products.json");
 
-// funciones para cargar y guardar
+// Lee PORT y MONGODB_URI desde .env
+const PORT = process.env.PORT || 4000;
+const MONGO_URI = process.env.MONGODB_URI;
+
+// Rutas de archivos JSON
+const dataDir = path.join(__dirname, "data");
+const categoriesFile = path.join(dataDir, "categories.json");
+const productsFile = path.join(dataDir, "products.json");
+
+// Funciones para cargar y guardar JSON 
 function loadJson(filePath, defaultValue) {
   try {
     if (!fs.existsSync(filePath)) {
@@ -28,22 +35,46 @@ function saveJson(filePath, data) {
   fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
 }
 
-
-app.use(cors());
+// Middlewares 
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL || "*", 
+  })
+);
 app.use(express.json());
 
+// Conexión a MongoDB Atlas
+if (!MONGO_URI) {
+  console.warn("⚠️  MONGODB_URI no está definido en .env");
+} else {
+  mongoose
+    .connect(MONGO_URI)
+    .then(() => console.log("✅ Conectado a MongoDB Atlas"))
+    .catch((err) =>
+      console.error("❌ Error conectando a MongoDB Atlas:", err.message)
+    );
+}
 
-/// Cargar datos desde los archivos JSON (semilla)
+// Endpoint de salud 
+app.get("/health", (req, res) => {
+  const dbState = mongoose.connection.readyState;
+  const dbStatus = dbState === 1 ? "up" : dbState === 2 ? "connecting" : "down";
+
+  res.json({
+    status: "ok",
+    db: dbStatus,
+    time: new Date().toISOString(),
+  });
+});
+
+// Cargar datos desde los archivos JSON
 let categories = loadJson(categoriesFile, []);
-let products   = loadJson(productsFile, []);
+let products = loadJson(productsFile, []);
 
-// Calcular siguiente ID disponible
-let nextProductId = products.reduce(
-  (max, p) => (p.id > max ? p.id : max),
-  0
-) + 1;
+let nextProductId =
+  products.reduce((max, p) => (p.id > max ? p.id : max), 0) + 1;
 
-// ---------- Validación ----------
+// Validación
 function validateProduct(body) {
   const errors = [];
 
@@ -95,7 +126,7 @@ function validateProduct(body) {
   };
 }
 
-// ---------- Rutas ----------
+// Rutas
 app.get("/", (req, res) => {
   res.send("BACKEND U3 – API funcionando ✅");
 });
@@ -139,7 +170,8 @@ app.get("/api/products/:id", (req, res) => {
 
 app.post("/api/products", (req, res) => {
   const { isValid, errors, value } = validateProduct(req.body);
-  if (!isValid) return res.status(400).json({ message: "Datos inválidos", errors });
+  if (!isValid)
+    return res.status(400).json({ message: "Datos inválidos", errors });
 
   const newProduct = { id: nextProductId++, ...value };
   products.push(newProduct);
@@ -149,7 +181,6 @@ app.post("/api/products", (req, res) => {
 
   res.status(201).json(newProduct);
 });
-
 
 app.put("/api/products/:id", (req, res) => {
   const id = Number(req.params.id);
@@ -172,11 +203,11 @@ app.put("/api/products/:id", (req, res) => {
   res.json(updated);
 });
 
-
 app.delete("/api/products/:id", (req, res) => {
-  const id    = Number(req.params.id);
+  const id = Number(req.params.id);
   const index = products.findIndex((p) => p.id === id);
-  if (index === -1) return res.status(404).json({ message: "Producto no encontrado" });
+  if (index === -1)
+    return res.status(404).json({ message: "Producto no encontrado" });
 
   const deleted = products.splice(index, 1)[0];
 
@@ -186,20 +217,18 @@ app.delete("/api/products/:id", (req, res) => {
   res.json({ message: "Producto eliminado", product: deleted });
 });
 
-
-// --- 404 genérico para cualquier otra ruta ---
+// 404 genérico para cualquier otra ruta 
 app.use((req, res, next) => {
   res.status(404).json({ message: "Recurso no encontrado" });
 });
 
-// --- Manejo de errores 500 (error interno) ---
+// Manejo de errores 500 (error interno) 
 app.use((err, req, res, next) => {
   console.error("Error no controlado:", err);
   res.status(500).json({ message: "Error interno del servidor" });
 });
 
-
-// ---------- Arranque ----------
-app.listen(port, () => {
-  console.log(`Servidor API U3 escuchando en puerto ${port}`);
+// Arranque 
+app.listen(PORT, () => {
+  console.log(`Servidor API U3 escuchando en puerto ${PORT}`);
 });

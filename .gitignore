@@ -1,0 +1,6 @@
+# Nunca subir archivos .env
+.env
+*.env
+*.env.*
+backend-api/.env
+frontend/.env
