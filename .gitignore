@@ -1,6 +1,12 @@
-# Nunca subir archivos .env
+# Nunca subir archivos .env reales
 .env
-*.env
-*.env.*
+.env.local
+.env.development
+.env.production
 backend-api/.env
 frontend/.env
+
+# Permitir archivos de ejemplo
+!.env.example
+!backend-api/.env.example
+!frontend/.env.example
