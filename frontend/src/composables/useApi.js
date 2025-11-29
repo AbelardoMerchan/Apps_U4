@@ -1,6 +1,7 @@
 import { ref } from "vue";
 
-const API_BASE_URL = "http://localhost:4000/api";
+const API_BASE_URL = 
+import.meta.env.VITE_API_URL || "http://localhost:4000/api";
 
 export function useApi() {
   const data = ref(null);
@@ -17,7 +18,6 @@ export function useApi() {
   }
 
   async function request(path, options = {}, { retry = false } = {}) {
-    // cancelar petición anterior
     cancelRequest();
     controller = new AbortController();
 
@@ -50,7 +50,7 @@ export function useApi() {
 
         const json = await response.json();
         data.value = json;
-        loading.value = false;   // se apaga loading en éxito
+        loading.value = false;
         return json;
       } catch (err) {
         if (err.name === "AbortError") {
@@ -63,15 +63,12 @@ export function useApi() {
 
         if (attempt === maxAttempts) {
           error.value = err.message || "Error de red";
-          loading.value = false;  // se apaga loading en fallo definitivo
+          loading.value = false;
           throw err;
         }
-
-        
       }
     }
 
-    
     loading.value = false;
     if (lastError) throw lastError;
   }
@@ -84,4 +81,5 @@ export function useApi() {
     cancelRequest,
   };
 }
+
 
