@@ -36,16 +36,16 @@ function saveJson(filePath, data) {
 }
 
 // Middlewares 
-const allowedOrigin =
-  process.env.FRONTEND_URL || "http://localhost:5173";
+const express = require("express");
+const cors = require("cors");
+// ...
 
-app.use(
-  cors({
-    origin: allowedOrigin,
-  })
-);
+const app = express();
 
+// Middlewares - CORS 
+app.use(cors());
 app.use(express.json());
+
 
 
 // Conexión a MongoDB Atlas

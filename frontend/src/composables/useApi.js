@@ -1,7 +1,7 @@
 import { ref } from "vue";
 
 const API_BASE_URL = 
-import.meta.env.VITE_API_URL || "http://localhost:4000/api";
+import.meta.env.VITE_API_URL || "https://appsu4-production.up.railway.app/api";
 
 export function useApi() {
   const data = ref(null);
