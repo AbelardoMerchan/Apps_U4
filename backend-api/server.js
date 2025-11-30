@@ -35,17 +35,9 @@ function saveJson(filePath, data) {
   fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
 }
 
-// Middlewares 
-const express = require("express");
-const cors = require("cors");
-// ...
-
-const app = express();
-
 // Middlewares - CORS 
 app.use(cors());
 app.use(express.json());
-
 
 
 // Conexión a MongoDB Atlas
