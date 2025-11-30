@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>MercApp – Despliegue U4</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 2rem 1rem 4rem;
+      line-height: 1.6;
+      background: #f5f5f5;
+    }
+    h1, h2, h3 {
+      color: #222;
+    }
+    header {
+      border-bottom: 2px solid #ddd;
+      margin-bottom: 1.5rem;
+      padding-bottom: .5rem;
+    }
+    .tag {
+      display: inline-block;
+      background: #222;
+      color: #fff;
+      padding: .15rem .5rem;
+      border-radius: 999px;
+      font-size: .8rem;
+      margin-right: .25rem;
+    }
+    section {
+      background: #fff;
+      margin-bottom: 1.5rem;
+      padding: 1.25rem 1.5rem;
+      border-radius: .75rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,.06);
+    }
+    code {
+      background: #eee;
+      padding: .15rem .35rem;
+      border-radius: .25rem;
+      font-size: .9rem;
+    }
+    pre {
+      background: #111;
+      color: #f5f5f5;
+      padding: 1rem;
+      border-radius: .75rem;
+      overflow-x: auto;
+      font-size: .9rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .9rem;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: .4rem .5rem;
+      text-align: left;
+    }
+    th {
+      background: #fafafa;
+    }
+    a {
+      color: #0070f3;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    .small {
+      font-size: .85rem;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>MercApp – Despliegue Unidad 4</h1>
+    <p class="small">
+      Estudiante: <strong>Abelardo Merchán Guevara</strong><br>
+      Asignatura: <strong>Aplicaciones Web</strong> – Universidad Politécnica Salesiana
+    </p>
+    <div>
+      <span class="tag">Vue 3</span>
+      <span class="tag">Vite</span>
+      <span class="tag">Node.js</span>
+      <span class="tag">Express</span>
+      <span class="tag">MongoDB Atlas</span>
+      <span class="tag">Railway</span>
+      <span class="tag">Netlify</span>
+    </div>
+  </header>
+
+  <section>
+    <h2>1. Descripción general del sistema</h2>
+    <p>
+      <strong>MercApp</strong> es una aplicación de catálogo de productos que permite:
+    </p>
+    <ul>
+      <li>Visualizar productos con nombre, precio, stock, categoría e imagen.</li>
+      <li>Filtrar por texto y por categoría.</li>
+      <li>Crear, editar y eliminar productos (CRUD).</li>
+    </ul>
+    <p>
+      El proyecto está compuesto por una <strong>SPA en Vue 3</strong> y una
+      <strong>API REST en Node.js + Express</strong>, con datos persistidos en
+      <strong>MongoDB Atlas</strong>.
+    </p>
+  </section>
+
+  <section>
+    <h2>2. Arquitectura de despliegue</h2>
+    <p>La arquitectura final en producción es la siguiente:</p>
+    <ul>
+      <li><strong>MongoDB Atlas</strong>: clúster M0 con base de datos <code>UPS</code>.</li>
+      <li><strong>Back-end (API)</strong>: desplegado en <strong>Railway</strong>.</li>
+      <li><strong>Front-end (SPA)</strong>: desplegado en <strong>Netlify</strong>.</li>
+      <li><strong>Micrositio</strong>: publicado en GitHub Pages (esta página).</li>
+    </ul>
+    <pre>
+Cliente (Navegador)
+        │
+        │  HTTPS (Netlify)
+        ▼
+SPA Vue 3  ──────────────►  API Express (Railway)  ─────────────►  MongoDB Atlas
+        ▲                        ▲
+        │                        │
+        └────────── GitHub Pages ┘
+    </pre>
+  </section>
+
+  <section>
+    <h2>3. URLs en producción</h2>
+    <ul>
+      <li><strong>Front-end (Netlify):</strong>
+        <a href="https://thriving-palmier-973f06.netlify.app" target="_blank">
+          https://thriving-palmier-973f06.netlify.app
+        </a>
+      </li>
+      <li><strong>API base (Railway):</strong>
+        <a href="https://appsu4-production.up.railway.app/api" target="_blank">
+          https://appsu4-production.up.railway.app/api
+        </a>
+      </li>
+      <li><strong>Endpoint de salud:</strong>
+        <code>GET /health</code> →
+        <a href="https://appsu4-production.up.railway.app/health" target="_blank">
+          https://appsu4-production.up.railway.app/health
+        </a>
+      </li>
+      <li><strong>Repositorio GitHub:</strong>
+        <a href="https://github.com/AbelardoMerchan/Apps_U4" target="_blank">
+          https://github.com/AbelardoMerchan/Apps_U4
+        </a>
+      </li>
+      <li><strong>Micrositio (GitHub Pages):</strong>
+        <!-- actualiza esta URL cuando Pages esté activado -->
+        <code>https://AbelardoMerchan.github.io/Apps_U4/</code>
+      </li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>4. Endpoints principales del API</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Método</th>
+          <th>Ruta</th>
+          <th>Descripción</th>
+          <th>Ejemplo</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>GET</td>
+          <td><code>/health</code></td>
+          <td>Verifica que la API y la conexión a MongoDB estén operativas.</td>
+          <td><code>GET https://appsu4-production.up.railway.app/health</code></td>
+        </tr>
+        <tr>
+          <td>GET</td>
+          <td><code>/api/categories</code></td>
+          <td>Lista todas las categorías disponibles.</td>
+          <td><code>GET /api/categories</code></td>
+        </tr>
+        <tr>
+          <td>GET</td>
+          <td><code>/api/products</code></td>
+          <td>Obtiene el listado de productos (con filtros opcionales).</td>
+          <td><code>GET /api/products?search=pan&amp;categoryId=1</code></td>
+        </tr>
+        <tr>
+          <td>GET</td>
+          <td><code>/api/products/:id</code></td>
+          <td>Obtiene el detalle de un producto por ID.</td>
+          <td><code>GET /api/products/1</code></td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td><code>/api/products</code></td>
+          <td>Crea un nuevo producto (valida nombre, precio, stock, categoría, imagen).</td>
+          <td><code>POST /api/products</code>, body JSON</td>
+        </tr>
+        <tr>
+          <td>PUT</td>
+          <td><code>/api/products/:id</code></td>
+          <td>Actualiza un producto existente.</td>
+          <td><code>PUT /api/products/1</code></td>
+        </tr>
+        <tr>
+          <td>DELETE</td>
+          <td><code>/api/products/:id</code></td>
+          <td>Elimina un producto por ID.</td>
+          <td><code>DELETE /api/products/1</code></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>5. Guía rápida para ejecución local</h2>
+    <h3>Back-end (API)</h3>
+    <ol>
+      <li>Clonar el repositorio y entrar a <code>backend-api/</code>.</li>
+      <li>Crear un archivo <code>.env</code> basado en <code>.env.example</code>.</li>
+      <li>Ejecutar <code>npm install</code>.</li>
+      <li>Levantar el servidor con <code>npm start</code> ó <code>npm run dev</code>.</li>
+    </ol>
+    <h3>Front-end (SPA Vue 3)</h3>
+    <ol>
+      <li>Entrar a <code>frontend/</code> y crear <code>.env</code> con <code>VITE_API_URL</code>.</li>
+      <li>Ejecutar <code>npm install</code>.</li>
+      <li>Desarrollo: <code>npm run dev</code> (Vite).</li>
+      <li>Build de producción: <code>npm run build</code> y <code>npm run preview</code>.</li>
+    </ol>
+  </section>
+
+  <footer class="small">
+    Última actualización: <span id="fecha"></span>
+  </footer>
+
+  <script>
+    document.getElementById("fecha").textContent =
+      new Date().toLocaleString("es-EC");
+  </script>
+</body>
+</html>
